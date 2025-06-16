@@ -1,17 +1,7 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
-
-export interface Me {
-  user_name: string;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;
+  twoFactorCode?: string;
 }
 
 export interface AuthResponse {

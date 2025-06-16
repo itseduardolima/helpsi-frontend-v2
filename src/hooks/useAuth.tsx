@@ -4,10 +4,11 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { authService } from "@/src/services/auth"
-import type { User, LoginCredentials, AuthResponse } from "@/src/types/auth"
+import type { LoginCredentials, AuthResponse } from "@/src/types/auth"
+import { Payload } from "../types/user"
 
 interface AuthContextData {
-  user: User | null
+  user: Payload | null
   signIn: (credentials: LoginCredentials) => Promise<void>
   signOut: () => void
   loading: boolean
@@ -17,7 +18,7 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<Payload | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -26,19 +27,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Verificar se temos dados de autenticação
         if (authService.hasValidAuthData()) {
           const storedUser = localStorage.getItem("@Helpsi:user")
+        
 
           if (storedUser) {
             try {
-              const parsedUser = JSON.parse(storedUser) as User
+              const parsedUser = JSON.parse(storedUser) as Payload
               setUser(parsedUser)
             } catch (parseError) {
               console.error("Error parsing stored user data:", parseError)
               clearAuthData()
             }
-          }
+          } 
         }
       } catch (error) {
         console.error("Error initializing authentication:", error)
@@ -63,14 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response: AuthResponse = await authService.login(credentials)
       const { access_token, refresh_token, name, login, profile, sub } = response
 
-      const userData: User = {
+      const userData: Payload = {
         id: sub,
         name,
         email: login,
         role: profile,
       }
 
-      // Salvar dados no localStorage
       localStorage.setItem("@Helpsi:user", JSON.stringify(userData))
       localStorage.setItem("@Helpsi:token", access_token)
 
@@ -98,7 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, loading, isAuthenticated }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, signIn, signOut, loading, isAuthenticated }}>
+      {children}
+    </AuthContext.Provider>
   )
 }
 

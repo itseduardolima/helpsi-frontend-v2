@@ -1,39 +1,39 @@
-import { useQuery } from '@tanstack/react-query';
-import api from '../lib/api';
+import { useQuery } from "@tanstack/react-query"
+import api from "../lib/api"
+import type { Psychologist } from "../types/psychologist"
 
 export interface Specialty {
-  specialty_id: string;
-  specialty_name: string;
+  specialty_id: string
+  specialty_name: string
 }
 
 export function useSpecialties() {
   return useQuery<Specialty[]>({
-    queryKey: ['specialties'],
+    queryKey: ["specialties"],
     queryFn: async () => {
-      const response = await api.get<Specialty[]>('/specialty');
-      return response.data;
-    }
-  });
-}
-
-export function usePsychologistsBySpecialty(specialtyId: string) {
-  return useQuery<Psychologist[]>({
-    queryKey: ['psychologists', specialtyId],
-    queryFn: async () => {
-      if (!specialtyId) return [];
-      const response = await api.get<{ items: Psychologist[] }>('/users', {
-        params: {
-          specialty_id: specialtyId,
-          user_profile_id: '3'
-        }
-      });
-      return response.data.items;
+      const response = await api.get<Specialty[]>("/specialty")
+      return response.data
     },
-    enabled: !!specialtyId
-  });
+  })
 }
 
-interface Psychologist {
-  user_id: string;
-  user_name: string;
-} 
+export function usePsychologistsBySpecialtyName(specialtyName: string) {
+  return useQuery({
+    queryKey: ["psychologists-by-specialty", specialtyName],
+    queryFn: async () => {
+      if (!specialtyName) return []
+
+      try {
+        const response = await api.get<Psychologist[]>(`/specialty/psychologist-by-specialty`, {
+          params: { specialty: specialtyName },
+        })
+        return response.data || []
+      } catch (error) {
+        console.error("Error fetching psychologists by specialty:", error)
+        return []
+      }
+    },
+    enabled: !!specialtyName,
+    initialData: [],
+  })
+}

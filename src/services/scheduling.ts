@@ -1,5 +1,5 @@
 
-import type { Scheduling, CreateSchedulingDto, UpdateSchedulingDto, SchedulingFilter } from '@/src/types/scheduling';
+import type { CreateSchedulingDto, Scheduling, SchedulingFilter } from '@/src/types/scheduling';
 import api from '../lib/api';
 
 export const schedulingService = {
@@ -8,14 +8,9 @@ export const schedulingService = {
     return response.data;
   },
 
-  async update(id: string, data: UpdateSchedulingDto): Promise<Scheduling> {
-    const response = await api.put<Scheduling>(`/scheduling/${id}`, data);
-    return response.data;
-  },
-
   async findAll(filter: SchedulingFilter): Promise<Scheduling[]> {
-    const response = await api.get<Scheduling[]>('/scheduling', { params: filter });
-    return response.data;
+    const response = await api.get<{ items: Scheduling[] }>('/scheduling', { params: filter });
+    return response.data.items;
   },
 
   async findOne(id: string): Promise<Scheduling> {

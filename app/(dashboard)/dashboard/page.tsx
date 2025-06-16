@@ -16,18 +16,18 @@ import { useMe } from "@/src/hooks/useUsers";
 import { getFirstName } from "@/src/utils/format-string";
 
 export default function DashboardPage() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const { data: userData, isLoading: isLoadingUser } = useMe();
   const { data: schedulings, isLoading: isLoadingSchedulings } = useScheduling({
-    patientId: user?.id,
+    patientId: userData?.user_id || '',
   });
   const { stats, activities, isLoading: isLoadingDashboard } = useDashboard();
 
   if (isLoadingUser || isLoadingSchedulings || isLoadingDashboard) {
     return (
       <Layout>
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-main"></div>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
         </div>
       </Layout>
     );

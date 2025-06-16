@@ -10,7 +10,7 @@ export interface CreateUserDto {
   user_cpf?: string;
   user_crp?: string;
   user_enrollment?: string;
-  specialty_ids?: string[];
+  specialtys?: { specialty_id: string; specialty_name: string }[];
 }
 
 export interface UpdateUserDto {
@@ -25,7 +25,9 @@ export interface UpdateUserDto {
   user_cpf?: string;
   user_crp?: string;
   user_enrollment?: string;
-  specialty_ids?: string[];
+  specialtys?: { specialty_id: string; specialty_name: string }[];
+  user_status?: boolean;
+  user_first_access?: boolean;
 }
 
 export interface User {

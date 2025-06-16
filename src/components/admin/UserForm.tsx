@@ -383,6 +383,8 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const { data: specialties = [] } = useSpecialties();
+
   const [formData, setFormData] = useState(() => {
     return {
       user_id: initialData?.user_id || "",
@@ -437,6 +439,13 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
     }
 
     if (initialData?.user_id) {
+      const specialtys = specialties
+        .filter(s => formData.specialty_ids.includes(s.specialty_id))
+        .map(s => ({
+          specialty_id: s.specialty_id,
+          specialty_name: s.specialty_name
+        }));
+
       const updateData: UpdateUserDto = {
         user_name: formData.user_name,
         user_email: formData.user_email,
@@ -447,6 +456,11 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         user_genre: formData.user_genre,
         user_rg: formData.user_rg,
         user_cpf: formData.user_cpf,
+        user_crp: formData.user_crp,
+        user_enrollment: formData.user_enrollment,
+        specialtys,
+        user_status: formData.user_status,
+        user_first_access: formData.user_first_access,
       };
 
       updateUser.mutate(
@@ -473,6 +487,13 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         return;
       }
 
+      const specialtys = specialties
+        .filter(s => formData.specialty_ids.includes(s.specialty_id))
+        .map(s => ({
+          specialty_id: s.specialty_id,
+          specialty_name: s.specialty_name
+        }));
+
       const createData: CreateUserDto = {
         user_name: formData.user_name,
         user_email: formData.user_email,
@@ -480,6 +501,12 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         user_profile_id: formData.user_profile_id.toString(),
         user_date_of_birth: formData.user_date_of_birth,
         user_phone: formData.user_phone,
+        user_genre: formData.user_genre,
+        user_rg: formData.user_rg,
+        user_cpf: formData.user_cpf,
+        user_crp: formData.user_crp,
+        user_enrollment: formData.user_enrollment,
+        specialtys,
       };
 
       createUser.mutate(createData, {

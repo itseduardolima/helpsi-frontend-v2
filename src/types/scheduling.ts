@@ -1,39 +1,24 @@
+import { Psychologist } from "./psychologist";
+
 export interface Scheduling {
-  id: string;
-  date: string;
-  time: string;
-  type: string;
-  status: string;
-  patientId: string;
-  doctorId: string;
-  reason?: string;
+  scheduling_id: string;
+  start_time: string;
+  end_time: string;
+  registrant_name: string;
   createdAt: string;
   updatedAt: string;
+  isCancelled: boolean;
+  currentPsychologist: Psychologist;
 }
 
 export interface CreateSchedulingDto {
-  date: string;
-  time: string;
-  type: string;
-  patientId: string;
-  doctorId: string;
-  reason?: string;
-}
-
-export interface UpdateSchedulingDto {
-  date?: string;
-  time?: string;
-  type?: string;
-  status?: string;
-  reason?: string;
+  duration: number;
+  select_date_time: Date;
+  patient_id: string;
+  psychologist_id: string;
+  registrant_name: string;
 }
 
 export interface SchedulingFilter {
-  patientId?: string;
-  doctorId?: string;
-  date?: string;
-  type?: string;
-  status?: string;
-  startDate?: string;
-  endDate?: string;
-} 
+  patientId: string;
+}

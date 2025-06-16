@@ -44,4 +44,19 @@ export const formatDateFromAPI = (dateString: string) => {
     console.error('Erro ao formatar data:', error);
     return '';
   }
-} 
+}
+
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+export const safeFormatDate = (date: Date | null | undefined, formatString: string): string => {
+  if (!date || isNaN(date.getTime())) {
+    return ""
+  }
+  try {
+    return format(date, formatString, { locale: ptBR })
+  } catch (error) {
+    console.error("Error formatting date:", error)
+    return ""
+  }
+}

@@ -1,50 +1,64 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { useSpecialties } from "@/src/hooks/useSpecialty";
-import { toast } from "sonner";
-import { CreateUserDto, UpdateUserDto } from "@/src/types/user";
-import { SuccessModal } from "@/src/components/ui/success-modal";
-import { useUsers } from "@/src/hooks/useUsers";
-import { formatDateFromAPI } from "@/src/utils/format-string";
-import { userSchema } from "@/src/schemas/userSchema";
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { useSpecialties } from "@/src/hooks/useSpecialty"
+import { toast } from "sonner"
+import type { CreateUserDto, UpdateUserDto } from "@/src/types/user"
+import { SuccessModal } from "@/src/components/ui/success-modal"
+import { useUsers } from "@/src/hooks/useUsers"
+import { formatDateFromAPI } from "@/src/utils/format-string"
+import { userSchema } from "@/src/schemas/userSchema"
+
+interface UserFormData {
+  user_id?: string
+  user_name: string
+  user_email: string
+  user_password: string
+  user_profile_id: string
+  user_phone: string
+  user_crp: string
+  user_enrollment: string
+  user_date_of_birth: string
+  user_genre: string
+  user_rg: string
+  user_cpf: string
+  specialtys: { specialty_id: string; specialty_name: string }[]
+  user_status: boolean
+  user_first_access: boolean
+}
 
 interface UserFormProps {
   initialData?: {
-    user_id?: string;
-    user_name: string;
-    user_email: string;
-    user_profile_id: string;
-    user_status: boolean;
-    user_first_access: boolean;
-    user_phone?: string;
-    user_rg?: string;
-    user_cpf?: string;
-    user_crp?: string;
-    user_enrollment?: string;
-    user_date_of_birth?: string;
-    user_genre?: string;
-    specialty_ids?: string[];
-  };
-  onSuccess?: () => void;
+    user_id?: string
+    user_name: string
+    user_email: string
+    user_profile_id: string
+    user_status: boolean
+    user_first_access: boolean
+    user_phone?: string
+    user_rg?: string
+    user_cpf?: string
+    user_crp?: string
+    user_enrollment?: string
+    user_date_of_birth?: string
+    user_genre?: string
+    specialtys?: { specialty_id: string; specialty_name: string }[]
+  }
+  onSuccess?: () => void
 }
 
 function BasicInfoForm({
   formData,
   setFormData,
 }: {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: UserFormData
+  setFormData: (data: UserFormData) => void
 }) {
   return (
     <div className="space-y-4">
@@ -54,9 +68,7 @@ function BasicInfoForm({
           <Input
             id="user_name"
             value={formData.user_name}
-            onChange={(e) =>
-              setFormData({ ...formData, user_name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
             required
           />
         </div>
@@ -67,38 +79,26 @@ function BasicInfoForm({
             id="user_email"
             type="email"
             value={formData.user_email}
-            onChange={(e) =>
-              setFormData({ ...formData, user_email: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="user_password">
-            Senha {formData.user_id && "(deixe em branco para manter a atual)"}
-          </Label>
+          <Label htmlFor="user_password">Senha {formData.user_id && "(deixe em branco para manter a atual)"}</Label>
           <Input
             id="user_password"
             type="password"
             value={formData.user_password}
-            onChange={(e) =>
-              setFormData({ ...formData, user_password: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_password: e.target.value })}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="user_profile_id">Perfil</Label>
           <Select
-            value={
-              formData.user_profile_id
-                ? String(formData.user_profile_id)
-                : undefined
-            }
-            onValueChange={(value) =>
-              setFormData({ ...formData, user_profile_id: value })
-            }
+            value={formData.user_profile_id ? String(formData.user_profile_id) : undefined}
+            onValueChange={(value) => setFormData({ ...formData, user_profile_id: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o perfil" />
@@ -112,26 +112,26 @@ function BasicInfoForm({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function PersonalInfoForm({
   formData,
   setFormData,
 }: {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: UserFormData
+  setFormData: (data: UserFormData) => void
 }) {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = e.target.value;
+    const date = e.target.value
     if (date) {
-      const [year, month, day] = date.split("-");
-      const formattedDate = `${day}/${month}/${year}`;
-      setFormData({ ...formData, user_date_of_birth: formattedDate });
+      const [year, month, day] = date.split("-")
+      const formattedDate = `${day}/${month}/${year}`
+      setFormData({ ...formData, user_date_of_birth: formattedDate })
     } else {
-      setFormData({ ...formData, user_date_of_birth: "" });
+      setFormData({ ...formData, user_date_of_birth: "" })
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -141,9 +141,7 @@ function PersonalInfoForm({
           <Input
             id="user_phone"
             value={formData.user_phone}
-            onChange={(e) =>
-              setFormData({ ...formData, user_phone: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_phone: e.target.value })}
           />
         </div>
 
@@ -154,11 +152,7 @@ function PersonalInfoForm({
             type="date"
             value={
               formData.user_date_of_birth
-                ? new Date(
-                    formData.user_date_of_birth.split("/").reverse().join("-")
-                  )
-                    .toISOString()
-                    .split("T")[0]
+                ? new Date(formData.user_date_of_birth.split("/").reverse().join("-")).toISOString().split("T")[0]
                 : ""
             }
             onChange={handleDateChange}
@@ -169,9 +163,7 @@ function PersonalInfoForm({
           <Label htmlFor="user_genre">Gênero</Label>
           <Select
             value={formData.user_genre}
-            onValueChange={(value) =>
-              setFormData({ ...formData, user_genre: value })
-            }
+            onValueChange={(value) => setFormData({ ...formData, user_genre: value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o gênero" />
@@ -189,9 +181,7 @@ function PersonalInfoForm({
           <Input
             id="user_rg"
             value={formData.user_rg}
-            onChange={(e) =>
-              setFormData({ ...formData, user_rg: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_rg: e.target.value })}
           />
         </div>
 
@@ -200,42 +190,37 @@ function PersonalInfoForm({
           <Input
             id="user_cpf"
             value={formData.user_cpf}
-            onChange={(e) =>
-              setFormData({ ...formData, user_cpf: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_cpf: e.target.value })}
           />
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function PsychologistInfoForm({
   formData,
   setFormData,
 }: {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: UserFormData
+  setFormData: (data: UserFormData) => void
 }) {
-  const { data: specialties, isLoading: isLoadingSpecialties } =
-    useSpecialties();
+  const { data: specialties, isLoading: isLoadingSpecialties } = useSpecialties()
 
   const handleSpecialtyChange = (value: string) => {
-    const specialtyId = value;
-    if (formData.specialty_ids.includes(specialtyId)) {
+    const specialtyId = value
+    if (formData.specialtys?.some((s) => s.specialty_id === specialtyId)) {
       setFormData({
         ...formData,
-        specialty_ids: formData.specialty_ids.filter(
-          (id: string) => id !== specialtyId
-        ),
-      });
+        specialtys: formData.specialtys?.filter((s) => s.specialty_id !== specialtyId),
+      })
     } else {
       setFormData({
         ...formData,
-        specialty_ids: [...formData.specialty_ids, specialtyId],
-      });
+        specialtys: [...(formData.specialtys || []), { specialty_id: specialtyId, specialty_name: "" }],
+      })
     }
-  };
+  }
 
   return (
     <div className="space-y-4">
@@ -245,9 +230,7 @@ function PsychologistInfoForm({
           <Input
             id="user_crp"
             value={formData.user_crp}
-            onChange={(e) =>
-              setFormData({ ...formData, user_crp: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_crp: e.target.value })}
             required
           />
         </div>
@@ -257,9 +240,7 @@ function PsychologistInfoForm({
           <Input
             id="user_enrollment"
             value={formData.user_enrollment}
-            onChange={(e) =>
-              setFormData({ ...formData, user_enrollment: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, user_enrollment: e.target.value })}
           />
         </div>
 
@@ -277,15 +258,9 @@ function PsychologistInfoForm({
                   </SelectItem>
                 ) : (specialties || []).length > 0 ? (
                   (specialties || [])
-                    .filter(
-                      (specialty) =>
-                        !formData.specialty_ids.includes(specialty.specialty_id)
-                    )
+                    .filter((specialty) => !formData.specialtys?.some((s) => s.specialty_id === specialty.specialty_id))
                     .map((specialty) => (
-                      <SelectItem
-                        key={specialty.specialty_id}
-                        value={specialty.specialty_id}
-                      >
+                      <SelectItem key={specialty.specialty_id} value={specialty.specialty_id}>
                         {specialty.specialty_name}
                       </SelectItem>
                     ))
@@ -297,27 +272,25 @@ function PsychologistInfoForm({
               </SelectContent>
             </Select>
 
-            {formData.specialty_ids.length > 0 && (
+            {formData.specialtys?.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.specialty_ids.map((specialtyId: string) => {
-                  const specialty = specialties?.find(
-                    (s) => s.specialty_id === specialtyId
-                  );
-                  return specialty ? (
+                {formData.specialtys?.map((specialty) => {
+                  const specialtyName = specialties?.find((s) => s.specialty_id === specialty.specialty_id)?.specialty_name
+                  return specialtyName ? (
                     <div
-                      key={specialtyId}
+                      key={specialty.specialty_id}
                       className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
                     >
                       <span>{specialty.specialty_name}</span>
                       <button
                         type="button"
-                        onClick={() => handleSpecialtyChange(specialtyId)}
+                        onClick={() => handleSpecialtyChange(specialty.specialty_id)}
                         className="text-primary hover:text-primary/80"
                       >
                         ×
                       </button>
                     </div>
-                  ) : null;
+                  ) : null
                 })}
               </div>
             )}
@@ -325,15 +298,15 @@ function PsychologistInfoForm({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function SettingsForm({
   formData,
   setFormData,
 }: {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: UserFormData
+  setFormData: (data: UserFormData) => void
 }) {
   return (
     <div className="space-y-4">
@@ -342,9 +315,7 @@ function SettingsForm({
           <Label htmlFor="user_status">Status</Label>
           <Select
             value={String(formData.user_status)}
-            onValueChange={(value) =>
-              setFormData({ ...formData, user_status: value === "true" })
-            }
+            onValueChange={(value) => setFormData({ ...formData, user_status: value === "true" })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione o status" />
@@ -360,9 +331,7 @@ function SettingsForm({
           <Label htmlFor="user_first_access">Primeiro Acesso</Label>
           <Select
             value={String(formData.user_first_access)}
-            onValueChange={(value) =>
-              setFormData({ ...formData, user_first_access: value === "true" })
-            }
+            onValueChange={(value) => setFormData({ ...formData, user_first_access: value === "true" })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecione se é primeiro acesso" />
@@ -375,76 +344,71 @@ function SettingsForm({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function UserForm({ initialData, onSuccess }: UserFormProps) {
-  const [currentTab, setCurrentTab] = useState("basic");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [currentTab, setCurrentTab] = useState("basic")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
-  const { data: specialties = [] } = useSpecialties();
+  const { data: specialties = [] } = useSpecialties()
 
-  const [formData, setFormData] = useState(() => {
+  const [formData, setFormData] = useState<UserFormData>(() => {
     return {
       user_id: initialData?.user_id || "",
       user_name: initialData?.user_name || "",
       user_email: initialData?.user_email || "",
       user_password: "",
-      user_profile_id: initialData?.user_profile_id
-        ? String(initialData.user_profile_id)
-        : "",
+      user_profile_id: initialData?.user_profile_id ? String(initialData.user_profile_id) : "",
       user_phone: initialData?.user_phone || "",
       user_crp: initialData?.user_crp || "",
       user_enrollment: initialData?.user_enrollment || "",
-      user_date_of_birth: initialData?.user_date_of_birth
-        ? formatDateFromAPI(initialData.user_date_of_birth)
-        : "",
+      user_date_of_birth: initialData?.user_date_of_birth ? formatDateFromAPI(initialData.user_date_of_birth) : "",
       user_genre: initialData?.user_genre || "",
       user_rg: initialData?.user_rg || "",
       user_cpf: initialData?.user_cpf || "",
-      specialty_ids: initialData?.specialty_ids || [],
-      user_status: initialData?.user_status,
-      user_first_access: initialData?.user_first_access,
-    };
-  });
+      specialtys: initialData?.specialtys || [],
+      user_status: initialData?.user_status ?? true,
+      user_first_access: initialData?.user_first_access ?? true,
+    }
+  })
 
-  const { createUser, updateUser } = useUsers();
+  const { createUser, updateUser } = useUsers()
 
-  const isPsychologist = Number(formData.user_profile_id) === 3;
+  const isPsychologist = Number(formData.user_profile_id) === 3
 
   useEffect(() => {
     if (!isPsychologist && currentTab === "psychologist") {
-      setCurrentTab("basic");
+      setCurrentTab("basic")
     }
-  }, [isPsychologist, currentTab]);
+  }, [isPsychologist, currentTab])
 
   useEffect(() => {
     if (isPsychologist && initialData?.user_id) {
-      setCurrentTab("psychologist");
+      setCurrentTab("psychologist")
     }
-  }, [isPsychologist, initialData?.user_id]);
+  }, [isPsychologist, initialData?.user_id])
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
-    const validation = userSchema.safeParse(formData);
+    const validation = userSchema.safeParse(formData)
     if (!validation.success) {
-      const firstError =
-        validation.error.errors[0]?.message || "Dados inválidos";
-      toast.error(firstError);
-      setIsSubmitting(false);
-      return;
+      const firstError = validation.error.errors[0]?.message || "Dados inválidos"
+      toast.error(firstError)
+      setIsSubmitting(false)
+      return
     }
 
     if (initialData?.user_id) {
       const specialtys = specialties
-        .filter(s => formData.specialty_ids.includes(s.specialty_id))
-        .map(s => ({
+        .filter(() => formData.specialtys?.some((s) => s.specialty_id === s.specialty_id))
+        .map((s) => ({
           specialty_id: s.specialty_id,
-          specialty_name: s.specialty_name
-        }));
+          specialty_name: s.specialty_name,
+        }))
 
       const updateData: UpdateUserDto = {
         user_name: formData.user_name,
@@ -461,7 +425,7 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         specialtys,
         user_status: formData.user_status,
         user_first_access: formData.user_first_access,
-      };
+      }
 
       updateUser.mutate(
         {
@@ -470,29 +434,29 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         },
         {
           onSuccess: () => {
-            setShowSuccessModal(true);
-            setIsSubmitting(false);
-            onSuccess?.();
+            setShowSuccessModal(true)
+            setIsSubmitting(false)
+            onSuccess?.()
           },
           onError: () => {
-            setIsSubmitting(false);
-            toast.error("Erro ao atualizar usuário");
+            setIsSubmitting(false)
+            toast.error("Erro ao atualizar usuário")
           },
-        }
-      );
+        },
+      )
     } else {
       if (!formData.user_password) {
-        toast.error("A senha é obrigatória para novo usuário");
-        setIsSubmitting(false);
-        return;
+        toast.error("A senha é obrigatória para novo usuário")
+        setIsSubmitting(false)
+        return
       }
 
       const specialtys = specialties
-        .filter(s => formData.specialty_ids.includes(s.specialty_id))
-        .map(s => ({
+        .filter(() => formData.specialtys?.some((s) => s.specialty_id === s.specialty_id))
+        .map((s) => ({
           specialty_id: s.specialty_id,
-          specialty_name: s.specialty_name
-        }));
+          specialty_name: s.specialty_name,
+        }))
 
       const createData: CreateUserDto = {
         user_name: formData.user_name,
@@ -507,24 +471,24 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         user_crp: formData.user_crp,
         user_enrollment: formData.user_enrollment,
         specialtys,
-      };
+      }
 
       createUser.mutate(createData, {
         onSuccess: () => {
-          setShowSuccessModal(true);
-          setIsSubmitting(false);
-          onSuccess?.();
+          setShowSuccessModal(true)
+          setIsSubmitting(false)
+          onSuccess?.()
         },
         onError: () => {
-          setIsSubmitting(false);
+          setIsSubmitting(false)
         },
-      });
+      })
     }
-  };
+  }
 
   const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-  };
+    setShowSuccessModal(false)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -562,21 +526,15 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
       </div>
 
       <div className="min-h-[400px]">
-        {currentTab === "basic" && (
-          <BasicInfoForm formData={formData} setFormData={setFormData} />
-        )}
+        {currentTab === "basic" && <BasicInfoForm formData={formData} setFormData={setFormData} />}
 
-        {currentTab === "personal" && (
-          <PersonalInfoForm formData={formData} setFormData={setFormData} />
-        )}
+        {currentTab === "personal" && <PersonalInfoForm formData={formData} setFormData={setFormData} />}
 
         {currentTab === "psychologist" && isPsychologist && (
           <PsychologistInfoForm formData={formData} setFormData={setFormData} />
         )}
 
-        {currentTab === "settings" && (
-          <SettingsForm formData={formData} setFormData={setFormData} />
-        )}
+        {currentTab === "settings" && <SettingsForm formData={formData} setFormData={setFormData} />}
       </div>
 
       <Button className="w-full" type="submit" disabled={isSubmitting}>
@@ -587,11 +545,9 @@ export function UserForm({ initialData, onSuccess }: UserFormProps) {
         open={showSuccessModal}
         onOpenChange={handleCloseSuccessModal}
         title="Sucesso!"
-        message={`Usuário ${
-          initialData ? "atualizado" : "criado"
-        } com sucesso!`}
+        message={`Usuário ${initialData ? "atualizado" : "criado"} com sucesso!`}
         type="success"
       />
     </form>
-  );
+  )
 }

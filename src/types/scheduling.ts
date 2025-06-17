@@ -20,5 +20,8 @@ export interface CreateSchedulingDto {
 }
 
 export interface SchedulingFilter {
-  patientId: string;
+  patient_id?: string;
+  psychologist_id?: string;
+  page?: number;
+  limit?: number;
 }

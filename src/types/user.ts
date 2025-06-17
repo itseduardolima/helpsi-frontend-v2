@@ -33,6 +33,7 @@ export interface UpdateUserDto {
 export interface User {
   user_id: string;
   user_name: string;
+  user_password: string;
   user_email: string;
   user_profile_id: string;
   user_status: boolean;
@@ -44,7 +45,7 @@ export interface User {
   user_cpf?: string;
   user_crp?: string;
   user_enrollment: string;
-  specialty_ids: string[];
+  specialtys?: { specialty_id: string; specialty_name: string }[]
   profile: {
     profile_id: number;
     profile_name: string;

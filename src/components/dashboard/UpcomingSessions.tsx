@@ -1,29 +1,64 @@
-"use client"
+"use client";
 
-import { Calendar, Clock, User, Phone, Video, MoreVertical, AlertCircle, CheckCircle } from "lucide-react"
-import { format, isPast } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import type { Scheduling } from "@/src/types/scheduling"
-import { Button } from "@/src/components/ui/button"
-import { Badge } from "@/src/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Video,
+  MoreVertical,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
+import { format, isPast } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import type { Scheduling } from "@/src/types/scheduling";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/src/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { getDateLabel, getTimeUntil } from "@/src/utils/date"
+} from "@/src/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/src/components/ui/avatar";
+import { getDateLabel, getTimeUntil } from "@/src/utils/date";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/src/components/ui/pagination";
+import { IMeta } from "@/src/types/meta";
 
 interface UpcomingSessionsProps {
-  schedulings: Scheduling[]
-  onCancelScheduling?: (schedulingId: string) => void
-  onRescheduleScheduling?: (schedulingId: string) => void
+  schedulings: Scheduling[];
+  meta?: IMeta<Scheduling>;
+  onPageChange?: (page: number) => void;
+  onCancelScheduling?: (schedulingId: string) => void;
+  onRescheduleScheduling?: (schedulingId: string) => void;
 }
 
-export function UpcomingSessions({ schedulings, onCancelScheduling, onRescheduleScheduling }: UpcomingSessionsProps) {
+export function UpcomingSessions({
+  schedulings,
+  meta,
+  onPageChange,
+  onCancelScheduling,
+  onRescheduleScheduling,
+}: UpcomingSessionsProps) {
   const getStatusBadge = (scheduling: Scheduling) => {
     if (scheduling.isCancelled) {
       return (
@@ -31,27 +66,29 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
           <AlertCircle className="w-3 h-3" />
           Cancelada
         </Badge>
-      )
+      );
     }
 
-    const startTime = new Date(scheduling.start_time)
+    const startTime = new Date(scheduling.start_time);
     if (isPast(startTime)) {
       return (
         <Badge variant="secondary" className="flex items-center gap-1">
           <CheckCircle className="w-3 h-3" />
           Concluída
         </Badge>
-      )
+      );
     }
 
     return (
-      <Badge variant="default" className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
+      <Badge
+        variant="default"
+        className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200"
+      >
         <Clock className="w-3 h-3" />
         Agendada
       </Badge>
-    )
-  }
-
+    );
+  };
 
   return (
     <Card className="lg:col-span-2">
@@ -65,9 +102,9 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
         {schedulings && schedulings.length > 0 ? (
           <div className="space-y-4">
             {schedulings.map((scheduling) => {
-              const startTime = new Date(scheduling.start_time)
-              const endTime = new Date(scheduling.end_time)
-              const timeUntil = getTimeUntil(startTime)
+              const startTime = new Date(scheduling.start_time);
+              const endTime = new Date(scheduling.end_time);
+              const timeUntil = getTimeUntil(startTime);
 
               return (
                 <div
@@ -76,8 +113,8 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                     scheduling.isCancelled
                       ? "bg-red-50 border-red-200"
                       : isPast(startTime)
-                        ? "bg-gray-50 border-gray-200"
-                        : "bg-blue-50 border-blue-200 hover:bg-blue-100"
+                      ? "bg-gray-50 border-gray-200"
+                      : "bg-blue-50 border-blue-200 hover:bg-blue-100"
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -86,10 +123,14 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           {getStatusBadge(scheduling)}
-                          <span className="text-sm  text-gray-600">{getDateLabel(startTime)}</span>
+                          <span className="text-sm  text-gray-600">
+                            {getDateLabel(startTime)}
+                          </span>
                         </div>
                         {timeUntil && (
-                          <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">{timeUntil}</span>
+                          <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
+                            {timeUntil}
+                          </span>
                         )}
                       </div>
 
@@ -100,16 +141,24 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-gray-500" />
                             <span className=" text-gray-500">
-                              {format(startTime, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                              {format(startTime, "dd 'de' MMMM 'de' yyyy", {
+                                locale: ptBR,
+                              })}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-gray-500" />
                             <span className="text-gray-500">
-                              {format(startTime, "HH:mm")} - {format(endTime, "HH:mm")}
+                              {format(startTime, "HH:mm")} -{" "}
+                              {format(endTime, "HH:mm")}
                             </span>
                             <span className="text-xs text-gray-500">
-                              ({Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60))} min)
+                              (
+                              {Math.round(
+                                (endTime.getTime() - startTime.getTime()) /
+                                  (1000 * 60)
+                              )}{" "}
+                              min)
                             </span>
                           </div>
                         </div>
@@ -131,8 +180,12 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className=" text-gray-900">{scheduling.currentPsychologist.user_name}</p>
-                              <p className="text-sm text-gray-600">Psicólogo(a)</p>
+                              <p className=" text-gray-900">
+                                {scheduling.currentPsychologist.user_name}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Psicólogo(a)
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -142,7 +195,8 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                       <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
                         <User className="w-4 h-4 text-gray-500" />
                         <span className="text-sm text-gray-600">
-                          Paciente: <span className="">{scheduling.registrant_name}</span>
+                          Paciente:{" "}
+                          <span className="">{scheduling.registrant_name}</span>
                         </span>
                       </div>
                     </div>
@@ -151,7 +205,11 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                     {!scheduling.isCancelled && !isPast(startTime) && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreVertical className="w-4 h-4" />
                             <span className="sr-only">Abrir menu</span>
                           </Button>
@@ -168,14 +226,18 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="flex items-center gap-2"
-                            onClick={() => onRescheduleScheduling?.(scheduling.scheduling_id)}
+                            onClick={() =>
+                              onRescheduleScheduling?.(scheduling.scheduling_id)
+                            }
                           >
                             <Calendar className="w-4 h-4" />
                             Reagendar
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="flex items-center gap-2 text-red-600"
-                            onClick={() => onCancelScheduling?.(scheduling.scheduling_id)}
+                            onClick={() =>
+                              onCancelScheduling?.(scheduling.scheduling_id)
+                            }
                           >
                             <AlertCircle className="w-4 h-4" />
                             Cancelar
@@ -185,7 +247,7 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
                     )}
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         ) : (
@@ -193,15 +255,58 @@ export function UpcomingSessions({ schedulings, onCancelScheduling, onReschedule
             <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
               <Calendar className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg  text-gray-900 mb-2">Nenhum agendamento encontrado</h3>
-            <p className="text-gray-600 mb-6">Você não possui consultas agendadas no momento.</p>
+            <h3 className="text-lg  text-gray-900 mb-2">
+              Nenhum agendamento encontrado
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Você não possui consultas agendadas no momento.
+            </p>
             <Button className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Agendar Nova Consulta
             </Button>
           </div>
         )}
+        {meta && meta.meta.totalPages > 1 && (
+          <Pagination className="mt-6">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  size="sm"
+                  onClick={() => onPageChange?.(meta.meta.currentPage - 1)}
+                  className={
+                    meta.meta.currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+              {Array.from({ length: meta.meta.totalPages }, (_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    size="sm"
+                    isActive={meta.meta.currentPage === i + 1}
+                    onClick={() => onPageChange?.(i + 1)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  size="sm"
+                  onClick={() => onPageChange?.(meta.meta.currentPage + 1)}
+                  className={
+                    meta.meta.currentPage === meta.meta.totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }

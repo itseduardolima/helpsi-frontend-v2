@@ -2,10 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { schedulingService } from "../services/scheduling";
 import api from "../lib/api";
 import { format, isValid } from "date-fns";
-import type { SchedulingFilter } from "../types/scheduling";
+import type { CreateSchedulingDto, SchedulingFilter, Scheduling,  } from "../types/scheduling";
+import { IMeta } from "../types/meta";
+
 
 export function useScheduling(filter: SchedulingFilter) {
-  return useQuery({
+  return useQuery<IMeta<Scheduling>>({
     queryKey: ["schedulings", filter],
     queryFn: () => schedulingService.findAll(filter),
   });
@@ -51,7 +53,7 @@ export function useCreateScheduling() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: CreateSchedulingDto) => {
       const response = await api.post("/scheduling", data);
       return response.data;
     },
@@ -60,3 +62,4 @@ export function useCreateScheduling() {
     },
   });
 }
+

@@ -155,7 +155,7 @@ export default function AdminUsersPage() {
                 user_cpf: editingUser.user_cpf,
                 user_crp: editingUser.user_crp,
                 user_enrollment: editingUser.user_enrollment,
-                specialty_ids: editingUser.specialty_ids,
+                specialtys: editingUser.specialtys,
               } : undefined}
               onSuccess={() => handleSuccess(editingUser ? 'update' : 'create')}
             />

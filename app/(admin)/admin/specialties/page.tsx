@@ -1,121 +1,104 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useAuth } from "@/src/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/src/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/src/components/ui/dialog";
-import { Search, Plus, Pencil, Trash2, Stethoscope } from "lucide-react";
-import { useSpecialties } from "@/src/hooks/useAdmin";
-import { SpecialtyForm } from "@/src/components/admin/SpecialtyForm";
-import { ConfirmDialog } from "@/src/components/ui/confirm-dialog";
-import { Specialty } from "@/src/types/specialty";
-import { toast } from "sonner";
-import { SuccessModal } from "@/src/components/ui/success-modal";
-import { formatName } from "@/src/utils/format-string";
+import { useState } from "react"
+import { useAuth } from "@/src/hooks/useAuth"
+import { Button } from "@/src/components/ui/button"
+import { Input } from "@/src/components/ui/input"
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
+import { Search, Plus, Pencil, Trash2, Stethoscope } from "lucide-react"
+import { useSpecialties } from "@/src/hooks/useAdmin"
+import { SpecialtyForm } from "@/src/components/admin/SpecialtyForm"
+import { ConfirmDialog } from "@/src/components/ui/confirm-dialog"
+import type { Specialty } from "@/src/types/specialty"
+import { toast } from "sonner"
+import { SuccessModal } from "@/src/components/ui/success-modal"
+import { formatName } from "@/src/utils/format-string"
 
 export default function AdminSpecialtiesPage() {
-  const router = useRouter();
-  const { isAuthenticated, loading, user } = useAuth();
-  const { specialties, isLoading, createSpecialty, updateSpecialty, deleteSpecialty } = useSpecialties();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingSpecialty, setEditingSpecialty] = useState<Specialty | null>(null);
-  const [deletingSpecialty, setDeletingSpecialty] = useState<Specialty | null>(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState({ title: '', message: '' });
+  const { loading } = useAuth()
+  const { specialties, isLoading, createSpecialty, updateSpecialty, deleteSpecialty } = useSpecialties()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [editingSpecialty, setEditingSpecialty] = useState<Specialty | null>(null)
+  const [deletingSpecialty, setDeletingSpecialty] = useState<Specialty | null>(null)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState({ title: "", message: "" })
 
   if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-main"></div>
       </div>
-    );
+    )
   }
-
-  const filteredSpecialties = specialties?.filter((specialty) =>
-    specialty.specialty_name.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
 
   const handleCreateSpecialty = async (data: { specialty_name: string }) => {
     try {
-      await createSpecialty(data.specialty_name);
-      setIsAddDialogOpen(false);
+      await createSpecialty(data.specialty_name)
+      setIsDialogOpen(false)
       setSuccessMessage({
         title: "Especialidade criada com sucesso!",
-        message: "A especialidade foi cadastrada no sistema."
-      });
-      setShowSuccessModal(true);
+        message: "A especialidade foi cadastrada no sistema.",
+      })
+      setShowSuccessModal(true)
     } catch (error) {
-      toast.error("Erro ao criar especialidade");
+      console.error("Error creating specialty:", error)
+      toast.error("Erro ao criar especialidade")
     }
-  };
+  }
 
   const handleUpdateSpecialty = async (data: { specialty_name: string }) => {
-    if (!editingSpecialty) return;
+    if (!editingSpecialty) return
     try {
       await updateSpecialty({
         id: editingSpecialty.specialty_id,
         name: data.specialty_name,
-      });
-      setIsDialogOpen(false);
-      setEditingSpecialty(null);
+      })
+      setIsDialogOpen(false)
+      setEditingSpecialty(null)
       setSuccessMessage({
         title: "Especialidade atualizada com sucesso!",
-        message: "As alterações foram salvas no sistema."
-      });
-      setShowSuccessModal(true);
+        message: "As alterações foram salvas no sistema.",
+      })
+      setShowSuccessModal(true)
     } catch (error) {
-      toast.error("Erro ao atualizar especialidade");
+      console.error("Error updating specialty:", error)
+      toast.error("Erro ao atualizar especialidade")
     }
-  };
+  }
 
   const handleDeleteSpecialty = async () => {
-    if (!deletingSpecialty) return;
+    if (!deletingSpecialty) return
     try {
-      await deleteSpecialty(deletingSpecialty.specialty_id);
-      setIsDeleteDialogOpen(false);
-      setDeletingSpecialty(null);
+      await deleteSpecialty(deletingSpecialty.specialty_id)
+      setIsDeleteDialogOpen(false)
+      setDeletingSpecialty(null)
       setSuccessMessage({
         title: "Especialidade excluída com sucesso!",
-        message: "A especialidade foi removida do sistema."
-      });
-      setShowSuccessModal(true);
+        message: "A especialidade foi removida do sistema.",
+      })
+      setShowSuccessModal(true)
     } catch (error) {
-      toast.error("Erro ao excluir especialidade");
+      console.error("Error deleting specialty:", error)
+      toast.error("Erro ao excluir especialidade")
     }
-  };
+  }
 
   const openEditDialog = (specialty: Specialty) => {
-    setEditingSpecialty(specialty);
-    setIsDialogOpen(true);
-  };
+    setEditingSpecialty(specialty)
+    setIsDialogOpen(true)
+  }
 
   const openDeleteDialog = (specialty: Specialty) => {
-    setDeletingSpecialty(specialty);
-    setIsDeleteDialogOpen(true);
-  };
+    setDeletingSpecialty(specialty)
+    setIsDeleteDialogOpen(true)
+  }
 
-  const openAddDialog = () => {
-    setIsAddDialogOpen(true);
-  };
+  const filteredSpecialties = specialties?.filter((specialty) =>
+    specialty.specialty_name.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -124,12 +107,15 @@ export default function AdminSpecialtiesPage() {
           <h1 className="text-3xl font-bold text-gray-900">Gerenciar Especialidades</h1>
           <p className="text-gray-500 mt-1">Gerencie as especialidades do sistema</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) {
-            setEditingSpecialty(null);
-          }
-        }}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            setIsDialogOpen(open)
+            if (!open) {
+              setEditingSpecialty(null)
+            }
+          }}
+        >
           <DialogTrigger asChild>
             <Button className="flex items-center gap-2">
               <Stethoscope className="w-5 h-5" />
@@ -184,22 +170,25 @@ export default function AdminSpecialtiesPage() {
           <div className="flex items-center justify-center p-8">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-main border-t-transparent"></div>
           </div>
-        ) : !specialties || specialties.length === 0 ? (
+        ) : !filteredSpecialties || filteredSpecialties.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center">
             <div className="rounded-full bg-gray-100 p-3">
               <Stethoscope className="h-6 w-6 text-gray-500" />
             </div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">Nenhuma especialidade encontrada</h3>
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              {searchTerm ? "Nenhuma especialidade encontrada" : "Nenhuma especialidade cadastrada"}
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              Comece adicionando uma nova especialidade ao sistema.
+              {searchTerm
+                ? "Tente ajustar os termos de busca."
+                : "Comece adicionando uma nova especialidade ao sistema."}
             </p>
-            <Button
-              onClick={() => openAddDialog()}
-              className="mt-4"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Adicionar Especialidade
-            </Button>
+            {!searchTerm && (
+              <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar Especialidade
+              </Button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -211,7 +200,7 @@ export default function AdminSpecialtiesPage() {
                 </tr>
               </thead>
               <tbody>
-                {specialties.map((specialty) => (
+                {filteredSpecialties.map((specialty) => (
                   <tr key={specialty.specialty_id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">{formatName(specialty.specialty_name)}</td>
                     <td className="px-4 py-3 text-right">
@@ -242,5 +231,5 @@ export default function AdminSpecialtiesPage() {
         )}
       </div>
     </div>
-  );
-} 
+  )
+}

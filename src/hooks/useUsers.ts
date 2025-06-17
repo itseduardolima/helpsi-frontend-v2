@@ -35,9 +35,9 @@ export function useUsers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: (error: any) => {
-      console.error("Erro ao criar usuário:", error);
-      toast.error(error.response?.data?.message || "Erro ao criar usuário");
+    onError: () => {
+      console.error("Erro ao criar usuário");
+      toast.error( "Erro ao criar usuário");
     },
   });
 
@@ -55,9 +55,9 @@ export function useUsers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: (error: any) => {
-      console.error("Erro ao atualizar usuário:", error);
-      toast.error(error.response?.data?.message || "Erro ao atualizar usuário");
+    onError: () => {
+      console.error("Erro ao atualizar usuário");
+      toast.error( "Erro ao atualizar usuário");
     },
   });
 
@@ -69,9 +69,9 @@ export function useUsers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: (error: any) => {
-      console.error("Erro ao excluir usuário:", error);
-      toast.error(error.response?.data?.message || "Erro ao excluir usuário");
+    onError: () => {
+      console.error("Erro ao excluir usuário");
+      toast.error( "Erro ao excluir usuário");
     },
   });
 

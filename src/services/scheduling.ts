@@ -1,16 +1,12 @@
-
-import type { CreateSchedulingDto, Scheduling, SchedulingFilter } from '@/src/types/scheduling';
+import type {  Scheduling, SchedulingFilter } from '@/src/types/scheduling';
 import api from '../lib/api';
+import { IMeta } from '../types/meta';
 
 export const schedulingService = {
-  async create(data: CreateSchedulingDto): Promise<Scheduling> {
-    const response = await api.post<Scheduling>('/scheduling', data);
-    return response.data;
-  },
 
-  async findAll(filter: SchedulingFilter): Promise<Scheduling[]> {
-    const response = await api.get<{ items: Scheduling[] }>('/scheduling', { params: filter });
-    return response.data.items;
+  async findAll(filter: SchedulingFilter): Promise<IMeta<Scheduling>> {
+    const response = await api.get<IMeta<Scheduling>>('/scheduling', { params: filter });
+    return response.data;
   },
 
   async findOne(id: string): Promise<Scheduling> {

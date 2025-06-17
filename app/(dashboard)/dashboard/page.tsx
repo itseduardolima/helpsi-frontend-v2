@@ -14,16 +14,17 @@ import { RecentActivities } from "@/src/components/dashboard/RecentActivities";
 import { UpcomingSessions } from "@/src/components/dashboard/UpcomingSessions";
 import { useMe } from "@/src/hooks/useUsers";
 import { getFirstName } from "@/src/utils/format-string";
+import { useState } from "react";
 
 export default function DashboardPage() {
   const { signOut } = useAuth();
   const { data: userData, isLoading: isLoadingUser } = useMe();
-  const { data: schedulings, isLoading: isLoadingSchedulings } = useScheduling({
-    patientId: userData?.user_id || '',
-  });
-  const { stats, activities, isLoading: isLoadingDashboard } = useDashboard();
+  const [page, setPage] = useState(1);
+  const limit = 2;
+  const { data, isLoading } = useScheduling({ patient_id: userData?.user_id, page, limit });
+  const { stats, activities } = useDashboard();
 
-  if (isLoadingUser || isLoadingSchedulings || isLoadingDashboard) {
+  if (isLoadingUser || isLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-screen">
@@ -131,7 +132,11 @@ export default function DashboardPage() {
 
             {/* Seção Principal */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <UpcomingSessions schedulings={schedulings || []} />
+              <UpcomingSessions 
+                schedulings={data?.items || []}
+                meta={data}
+                onPageChange={setPage}
+              />
               <RecentActivities activities={activities || []} />
             </div>
           </div>

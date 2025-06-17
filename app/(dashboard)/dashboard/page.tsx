@@ -3,7 +3,6 @@
 import { useAuth } from "@/src/hooks/useAuth";
 import { Layout } from "@/src/components/Layout";
 import { Button } from "@/src/components/ui/button";
-
 import { useScheduling } from "@/src/hooks/useScheduling";
 import {  SchedulingModal } from "@/src/components/SchedulingForm";
 import { Brain, User, LogOut, Bell, Settings, Shield } from "lucide-react";
@@ -15,14 +14,24 @@ import { UpcomingSessions } from "@/src/components/dashboard/UpcomingSessions";
 import { useMe } from "@/src/hooks/useUsers";
 import { getFirstName } from "@/src/utils/format-string";
 import { useState } from "react";
+import { psychologistActivities, psychologistStats } from "@/src/mocks/dashboard";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function DashboardPage() {
-  const { signOut } = useAuth();
+  const { signOut, user} = useAuth();
   const { data: userData, isLoading: isLoadingUser } = useMe();
   const [page, setPage] = useState(1);
   const limit = 2;
-  const { data, isLoading } = useScheduling({ patient_id: userData?.user_id, page, limit });
   const { stats, activities } = useDashboard();
+  const isPsychologist = user?.role === "PSYCHOLOGIST";
+  const schedulingFilter = isPsychologist
+    ? { psychologist_id: userData?.user_id, page, limit }
+    : { patient_id: userData?.user_id, page, limit };
+
+  const { data, isLoading } = useScheduling(schedulingFilter);
+
+
 
   if (isLoadingUser || isLoading) {
     return (
@@ -37,7 +46,6 @@ export default function DashboardPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Header */}
         <header className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -82,52 +90,65 @@ export default function DashboardPage() {
                   Olá, {getFirstName(userData?.user_name || "")}!
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Como você está se sentindo hoje?
+                  {isPsychologist
+                    ? "Aqui estão seus próximos agendamentos e estatísticas do consultório."
+                    : "Como você está se sentindo hoje?"}
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
-                  <User className="w-4 h-4" />
-                  Atualizar Perfil
-                </Button>
-                <SchedulingModal />
-              </div>
+              {!isPsychologist && (
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Button variant="outline" className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <User className="w-4 h-4" />
+                    Atualizar Perfil
+                  </Button>
+                  <SchedulingModal />
+                </div>
+              )}
             </div>
 
             {/* Cards de Estatísticas */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <StatsCard
-                title="Sessões Realizadas"
-                value={stats?.sessionsCompleted || 0}
-                icon={Brain}
-                gradientFrom="from-blue-50"
-                gradientTo="to-indigo-50"
-                iconColor="text-blue-600"
-              />
-              <StatsCard
-                title="Bem-estar"
-                value={`${stats?.wellbeingPercentage || 0}%`}
-                icon={Brain}
-                gradientFrom="from-purple-50"
-                gradientTo="to-pink-50"
-                iconColor="text-purple-600"
-              />
-              <StatsCard
-                title="Diário Emocional"
-                value={`${stats?.emotionalDiaryDays || 0} dias`}
-                icon={Brain}
-                gradientFrom="from-green-50"
-                gradientTo="to-emerald-50"
-                iconColor="text-green-600"
-              />
-              <StatsCard
-                title="Próxima Sessão"
-                value={`${stats?.nextSessionDays || 0} dias`}
-                icon={Brain}
-                gradientFrom="from-orange-50"
-                gradientTo="to-amber-50"
-                iconColor="text-orange-600"
-              />
+              {isPsychologist
+                ? psychologistStats.map((stat) => (
+                    <StatsCard key={stat.title} {...stat} />
+                  ))
+                : (
+                  <>
+                    <StatsCard
+                      title="Sessões Realizadas"
+                      value={stats?.sessionsCompleted || 0}
+                      icon={Brain}
+                      gradientFrom="from-blue-50"
+                      gradientTo="to-indigo-50"
+                      iconColor="text-blue-600"
+                    />
+                    <StatsCard
+                      title="Bem-estar"
+                      value={`${stats?.wellbeingPercentage || 0}%`}
+                      icon={Brain}
+                      gradientFrom="from-purple-50"
+                      gradientTo="to-pink-50"
+                      iconColor="text-purple-600"
+                    />
+                    <StatsCard
+                      title="Diário Emocional"
+                      value={`${stats?.emotionalDiaryDays || 0} dias`}
+                      icon={Brain}
+                      gradientFrom="from-green-50"
+                      gradientTo="to-emerald-50"
+                      iconColor="text-green-600"
+                    />
+                    <StatsCard
+                      title="Próxima Sessão"
+                      value={`${stats?.nextSessionDays || 0} dias`}
+                      icon={Brain}
+                      gradientFrom="from-orange-50"
+                      gradientTo="to-amber-50"
+                      iconColor="text-orange-600"
+                    />
+                  </>
+                )
+              }
             </div>
 
             {/* Seção Principal */}
@@ -137,7 +158,18 @@ export default function DashboardPage() {
                 meta={data}
                 onPageChange={setPage}
               />
-              <RecentActivities activities={activities || []} />
+              <RecentActivities
+                activities={
+                  isPsychologist
+                    ? psychologistActivities.map(a => ({
+                        id: a.id,
+                        type: a.type as "diary" | "scheduling",
+                        title: a.description,
+                        timestamp: format(new Date(a.date), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })
+                      }))
+                    : (activities || [])
+                }
+              />
             </div>
           </div>
         </main>
